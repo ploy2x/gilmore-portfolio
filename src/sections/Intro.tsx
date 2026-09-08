@@ -1,14 +1,17 @@
 import { about, person, stats, whyHire, wins } from '../data/site'
 import { HashLink } from '../lib/router'
 import { Chip, Container, Reveal, Section, SectionHeading } from '../components/ui'
+import { Marquee } from '../components/Marquee'
 
-/** Lighthouse-style score ring. Uses a stroke-dashoffset arc so it stays crisp
- *  at any size and animates in without layout work. */
-function ScoreRing({ score }: { score: number }) {
+/**
+ * Lighthouse score as a skeuomorphic dial: the track is a groove pressed into
+ * the clay, the accent arc rides in it, and the number sits on a raised cap.
+ */
+function ScoreDial({ score }: { score: number }) {
   const radius = 42
   const circumference = 2 * Math.PI * radius
   return (
-    <div className="relative grid size-28 place-items-center">
+    <div className="well relative grid size-28 shrink-0 place-items-center rounded-full">
       <svg className="size-full -rotate-90" viewBox="0 0 100 100" aria-hidden="true">
         <circle
           cx="50"
@@ -16,7 +19,7 @@ function ScoreRing({ score }: { score: number }) {
           r={radius}
           fill="none"
           stroke="currentColor"
-          strokeWidth="7"
+          strokeWidth="6"
           className="text-line"
         />
         <circle
@@ -25,14 +28,16 @@ function ScoreRing({ score }: { score: number }) {
           r={radius}
           fill="none"
           stroke="currentColor"
-          strokeWidth="7"
+          strokeWidth="6"
           strokeLinecap="round"
           className="text-accent"
           strokeDasharray={circumference}
           strokeDashoffset={circumference * (1 - score / 100)}
         />
       </svg>
-      <span className="text-ink tnum absolute text-3xl font-extrabold">{score}</span>
+      <div className="card absolute grid size-16 place-items-center rounded-full">
+        <span className="text-ink tnum text-2xl font-extrabold">{score}</span>
+      </div>
     </div>
   )
 }
@@ -42,13 +47,11 @@ function HeroPanel() {
     <div className="card p-6 sm:p-7">
       <div className="flex items-center justify-between gap-3">
         <p className="eyebrow">Measured, not claimed</p>
-        <span className="bg-accent/10 text-accent rounded-full px-2.5 py-1 font-mono text-[0.65rem] font-medium">
-          giftsplaza.com
-        </span>
+        <span className="chip font-mono text-[0.65rem]">giftsplaza.com</span>
       </div>
 
       <div className="mt-6 flex items-center gap-6">
-        <ScoreRing score={98} />
+        <ScoreDial score={98} />
         <div>
           <p className="text-ink text-sm font-semibold">Lighthouse Performance</p>
           <p className="text-muted mt-1 text-sm leading-relaxed">
@@ -57,17 +60,17 @@ function HeroPanel() {
         </div>
       </div>
 
-      <dl className="border-line mt-6 grid grid-cols-3 gap-4 border-t pt-5">
+      <dl className="mt-6 grid grid-cols-3 gap-3">
         {[
           { k: 'LCP', v: '0.9s' },
           { k: 'CLS', v: '0.001' },
           { k: 'Impressions', v: '77.8K' },
         ].map((m) => (
-          <div key={m.k}>
-            <dt className="text-faint font-mono text-[0.65rem] tracking-wider uppercase">
+          <div key={m.k} className="well rounded-xl p-3 text-center">
+            <dt className="text-faint font-mono text-[0.6rem] tracking-wider uppercase">
               {m.k}
             </dt>
-            <dd className="text-ink tnum mt-1 text-lg font-bold">{m.v}</dd>
+            <dd className="text-ink tnum mt-1 text-base font-bold">{m.v}</dd>
           </div>
         ))}
       </dl>
@@ -78,7 +81,6 @@ function HeroPanel() {
 export function Hero() {
   return (
     <section className="relative overflow-hidden pt-16 pb-20 sm:pt-24 sm:pb-28">
-      {/* Soft accent wash behind the fold. Purely decorative. */}
       <div
         aria-hidden="true"
         className="from-accent/8 pointer-events-none absolute inset-x-0 top-0 -z-10 h-[32rem] bg-gradient-to-b to-transparent"
@@ -101,16 +103,10 @@ export function Hero() {
 
             <Reveal delay={90}>
               <div className="mt-8 flex flex-wrap gap-3">
-                <HashLink
-                  to="#projects"
-                  className="bg-accent text-accent-ink rounded-full px-6 py-3 text-sm font-semibold transition-opacity hover:opacity-90"
-                >
+                <HashLink to="#projects" className="btn-primary">
                   View My Work →
                 </HashLink>
-                <HashLink
-                  to="#resume"
-                  className="border-line text-ink hover:border-accent/60 rounded-full border px-6 py-3 text-sm font-semibold transition-colors"
-                >
+                <HashLink to="#resume" className="btn-ghost">
                   Download Resume
                 </HashLink>
               </div>
@@ -144,10 +140,10 @@ export function WhyHire() {
         {whyHire.points.map((point, i) => (
           <Reveal key={point.title} delay={i * 80}>
             <article className="card card-hover h-full p-6">
-              <span className="text-accent font-mono text-xs font-medium">
+              <span className="chip text-accent font-mono text-xs font-medium">
                 0{i + 1}
               </span>
-              <h3 className="text-ink mt-3 text-lg font-bold">{point.title}</h3>
+              <h3 className="text-ink mt-4 text-lg font-bold">{point.title}</h3>
               <p className="text-muted mt-2.5 text-sm leading-relaxed">{point.body}</p>
             </article>
           </Reveal>
@@ -162,25 +158,28 @@ export function Wins() {
     <Section>
       <SectionHeading eyebrow={wins.eyebrow} heading={wins.heading} intro={wins.intro} />
 
-      <ul className="mt-12 grid gap-3 sm:grid-cols-2">
-        {wins.items.map((win, i) => (
-          <Reveal key={win.text} delay={i * 60}>
-            <li className="card card-hover flex h-full items-center gap-4 p-5">
-              <span aria-hidden="true" className="text-2xl leading-none">
+      {/* Ticker of shipped outcomes. Duplicated inside <Marquee> for the loop;
+          reduced-motion collapses it to a wrapped row. */}
+      <Reveal className="mt-12">
+        <Marquee label="Recent wins" durationSec={40}>
+          {wins.items.map((win) => (
+            <div
+              key={win.text}
+              className="card flex items-center gap-3 px-5 py-4 whitespace-nowrap"
+            >
+              <span aria-hidden="true" className="text-xl leading-none">
                 {win.icon}
               </span>
-              <span className="text-ink text-sm leading-relaxed font-medium">
-                {win.text}
-              </span>
-            </li>
-          </Reveal>
-        ))}
-      </ul>
+              <span className="text-ink text-sm font-medium">{win.text}</span>
+            </div>
+          ))}
+        </Marquee>
+      </Reveal>
 
       <Reveal delay={120}>
-        <dl className="border-line mt-14 grid grid-cols-2 gap-x-6 gap-y-10 border-t pt-10 sm:grid-cols-3 lg:grid-cols-5">
+        <dl className="mt-14 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {stats.map((stat) => (
-            <div key={stat.label}>
+            <div key={stat.label} className="card px-4 py-5 text-center">
               <dt className="text-accent tnum text-3xl font-extrabold sm:text-4xl">
                 {stat.value}
               </dt>
@@ -204,11 +203,7 @@ export function About() {
     <Section id="about" bleed>
       <div className="grid items-center gap-10 lg:grid-cols-[19rem_1fr] lg:gap-14">
         <Reveal className="mx-auto w-full max-w-72 lg:mx-0">
-          <div className="relative">
-            <div
-              aria-hidden="true"
-              className="bg-accent-soft absolute -inset-3 -z-10 rounded-[1.75rem]"
-            />
+          <div className="card overflow-hidden rounded-3xl p-2.5">
             <img
               src={PORTRAIT}
               alt="Gilmore Jason Dasmariñas"
@@ -216,7 +211,7 @@ export function About() {
               height={669}
               loading="lazy"
               decoding="async"
-              className="border-line h-auto w-full rounded-3xl border object-cover"
+              className="h-auto w-full rounded-[1.25rem] object-cover"
             />
           </div>
         </Reveal>
@@ -246,7 +241,7 @@ export function About() {
       </div>
 
       <Reveal delay={100}>
-        <figure className="border-accent bg-surface mt-10 rounded-r-xl border-l-2 p-7 sm:p-9">
+        <figure className="well mt-10 p-7 sm:p-9">
           <figcaption className="eyebrow">{about.missionLabel}</figcaption>
           <blockquote className="text-ink mt-3 text-lg leading-relaxed font-semibold sm:text-xl">
             “{about.mission}”

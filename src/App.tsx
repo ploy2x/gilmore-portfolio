@@ -84,10 +84,7 @@ function NotFound() {
           That page doesn’t exist — it may have moved. Everything lives on the portfolio
           homepage.
         </p>
-        <Link
-          to="/"
-          className="bg-accent text-accent-ink mt-8 inline-block rounded-full px-6 py-3 text-sm font-semibold"
-        >
+        <Link to="/" className="btn-primary mt-8 inline-flex">
           ← Back to portfolio
         </Link>
       </Reveal>

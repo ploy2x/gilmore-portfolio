@@ -12,6 +12,7 @@ import {
 } from '../data/site'
 import { HashLink } from '../lib/router'
 import { Chip, PlusIcon, Reveal, Section, SectionHeading } from '../components/ui'
+import { Marquee } from '../components/Marquee'
 
 export function Testimonials() {
   return (
@@ -148,7 +149,7 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
   const panelId = `faq-panel-${index}`
 
   return (
-    <div className="border-line border-b">
+    <div className="card px-5 sm:px-6">
       <h3>
         <button
           type="button"
@@ -160,17 +161,23 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
           <span className="text-ink group-hover:text-accent text-base font-semibold transition-colors">
             {q}
           </span>
-          <PlusIcon
-            className={`text-accent size-4 shrink-0 transition-transform duration-300 ${
-              open ? 'rotate-45' : ''
+          <span
+            className={`grid size-7 shrink-0 place-items-center rounded-full transition-shadow ${
+              open ? 'pressed' : 'card'
             }`}
-          />
+          >
+            <PlusIcon
+              className={`text-accent size-3.5 transition-transform duration-300 ${
+                open ? 'rotate-45' : ''
+              }`}
+            />
+          </span>
         </button>
       </h3>
       <div
         id={panelId}
         hidden={!open}
-        className="text-muted pb-5 text-sm leading-relaxed sm:pr-10"
+        className="text-muted well mt-1 mb-5 p-4 text-sm leading-relaxed"
       >
         {a}
       </div>
@@ -183,7 +190,7 @@ export function Faq() {
     <Section>
       <SectionHeading eyebrow={faq.eyebrow} heading={faq.heading} intro={faq.intro} />
       <Reveal delay={80}>
-        <div className="border-line mt-12 border-t">
+        <div className="mt-12 space-y-3">
           {faq.items.map((item, i) => (
             <FaqItem key={item.q} q={item.q} a={item.a} index={i} />
           ))}
@@ -198,33 +205,39 @@ export function Skills() {
     <Section id="skills" bleed>
       <SectionHeading eyebrow={skills.eyebrow} heading={skills.heading} intro={skills.intro} />
 
-      <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {/* A tech wall — one scrolling row per group, alternating direction, each
+          pinned with its label. Items are doubled inside every row so the loop
+          stays gap-free even when a group is short. Rows pause on hover and, for
+          reduced-motion, drop to a wrapped list (index.css). */}
+      <Reveal className="mt-12 space-y-3">
         {skills.groups.map((group, i) => (
-          <Reveal key={group.title} delay={(i % 3) * 70}>
-            <article className="card h-full p-6">
-              <div className="flex items-baseline justify-between gap-3">
-                <h3 className="text-ink text-base font-bold">{group.title}</h3>
-                <span className="text-faint tnum font-mono text-xs">
-                  {String(group.items.length).padStart(2, '0')}
-                </span>
-              </div>
-              <ul className="mt-4 flex flex-wrap gap-1.5">
-                {group.items.map((item) => (
-                  <li key={item}>
-                    <Chip>{item}</Chip>
-                  </li>
+          <div key={group.title}>
+            <p className="text-faint mb-1.5 font-mono text-[0.65rem] tracking-wider uppercase sm:hidden">
+              {group.title}
+            </p>
+            <div className="flex items-center gap-3">
+              <span className="chip text-ink hidden shrink-0 font-semibold sm:inline-flex">
+                {group.title}
+              </span>
+              <Marquee
+                label={`${group.title} skills`}
+                direction={i % 2 === 0 ? 'left' : 'right'}
+                durationSec={36 + i * 5}
+                className="min-w-0 flex-1"
+              >
+                {[...group.items, ...group.items].map((item, idx) => (
+                  <span key={`${item}-${idx}`} className="chip">
+                    {item}
+                  </span>
                 ))}
-              </ul>
-            </article>
-          </Reveal>
+              </Marquee>
+            </div>
+          </div>
         ))}
-      </div>
+      </Reveal>
     </Section>
   )
 }
-
-const FIELD =
-  'w-full rounded-lg border border-line bg-surface px-3.5 py-2.5 text-sm text-ink placeholder:text-faint transition-colors focus:border-accent focus:outline-none'
 
 export function Contact() {
   const [sent, setSent] = useState(false)
@@ -273,7 +286,7 @@ export function Contact() {
                   <label htmlFor="name" className="text-ink mb-1.5 block text-xs font-semibold">
                     Name
                   </label>
-                  <input id="name" name="name" required autoComplete="name" className={FIELD} />
+                  <input id="name" name="name" required autoComplete="name" className="nm-input" />
                 </div>
                 <div>
                   <label htmlFor="email" className="text-ink mb-1.5 block text-xs font-semibold">
@@ -285,7 +298,7 @@ export function Contact() {
                     type="email"
                     required
                     autoComplete="email"
-                    className={FIELD}
+                    className="nm-input"
                   />
                 </div>
               </div>
@@ -294,20 +307,17 @@ export function Contact() {
                 <label htmlFor="company" className="text-ink mb-1.5 block text-xs font-semibold">
                   Company / Website
                 </label>
-                <input id="company" name="company" autoComplete="organization" className={FIELD} />
+                <input id="company" name="company" autoComplete="organization" className="nm-input" />
               </div>
 
               <div>
                 <label htmlFor="message" className="text-ink mb-1.5 block text-xs font-semibold">
                   Message
                 </label>
-                <textarea id="message" name="message" rows={5} required className={FIELD} />
+                <textarea id="message" name="message" rows={5} required className="nm-input" />
               </div>
 
-              <button
-                type="submit"
-                className="bg-accent text-accent-ink w-full rounded-full px-6 py-3 text-sm font-semibold transition-opacity hover:opacity-90 sm:w-auto"
-              >
+              <button type="submit" className="btn-primary w-full sm:w-auto">
                 {contact.submitLabel}
               </button>
 

@@ -180,31 +180,37 @@ export function Experience() {
         intro={experience.intro}
       />
 
-      <ol className="border-line mt-12 border-l pl-6 sm:pl-10">
+      <ol className="border-line/70 mt-12 space-y-4 border-l pl-6 sm:pl-10">
         {experience.items.map((item, i) => (
           <Reveal key={item.period} delay={i * 60}>
-            <li className="relative pb-10 last:pb-0">
-              {/* Timeline node, pulled back onto the rail. */}
+            <li className="relative">
+              {/* Timeline node, sitting in a pressed dimple on the rail. */}
               <span
                 aria-hidden="true"
-                className={`bg-paper absolute top-1.5 -left-[1.8125rem] size-2.5 rounded-full ring-4 sm:-left-[2.8125rem] ${
-                  item.current ? 'bg-accent ring-accent/20' : 'border-line border-2'
-                }`}
-              />
-              <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <p className="text-accent tnum font-mono text-xs font-medium tracking-wide">
-                  {item.period}
+                className="well absolute top-5 -left-[1.65rem] grid size-4 place-items-center rounded-full sm:-left-[2.65rem]"
+              >
+                <span
+                  className={`size-1.5 rounded-full ${
+                    item.current ? 'bg-accent' : 'bg-faint'
+                  }`}
+                />
+              </span>
+              <article className="card p-5 sm:p-6">
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <p className="text-accent tnum font-mono text-xs font-medium tracking-wide">
+                    {item.period}
+                  </p>
+                  {item.current && (
+                    <span className="chip text-accent text-[0.65rem] font-semibold">
+                      Current
+                    </span>
+                  )}
+                </div>
+                <h3 className="text-ink mt-1.5 text-lg font-bold">{item.role}</h3>
+                <p className="text-muted mt-2 max-w-2xl text-sm leading-relaxed">
+                  {item.body}
                 </p>
-                {item.current && (
-                  <span className="bg-accent-soft text-accent rounded-full px-2 py-0.5 text-[0.65rem] font-semibold">
-                    Current
-                  </span>
-                )}
-              </div>
-              <h3 className="text-ink mt-1.5 text-lg font-bold">{item.role}</h3>
-              <p className="text-muted mt-2 max-w-2xl text-sm leading-relaxed">
-                {item.body}
-              </p>
+              </article>
             </li>
           </Reveal>
         ))}

@@ -11,11 +11,17 @@ function ThemeToggle() {
   return (
     <button
       type="button"
+      role="switch"
+      aria-checked={theme === 'dark'}
       onClick={toggle}
-      aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-      className="border-line text-muted hover:text-ink hover:border-accent/50 grid size-9 shrink-0 place-items-center rounded-full border transition-colors"
+      aria-label="Toggle dark theme"
+      className="switch"
     >
-      {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+      <span className="switch__icons" aria-hidden="true">
+        <SunIcon className="size-3" />
+        <MoonIcon className="size-3" />
+      </span>
+      <span className="switch__knob" />
     </button>
   )
 }
@@ -47,10 +53,10 @@ export function Header() {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-[background-color,border-color,backdrop-filter] duration-300 ${
+      className={`sticky top-0 z-50 transition-[background-color,box-shadow,backdrop-filter] duration-300 ${
         scrolled || open
-          ? 'border-line bg-paper/85 border-b backdrop-blur-xl'
-          : 'border-b border-transparent'
+          ? 'bg-paper/90 shadow-[0_10px_24px_-16px_var(--nm-dark)] backdrop-blur-xl'
+          : ''
       }`}
     >
       <Container>
@@ -70,9 +76,9 @@ export function Header() {
                 <HashLink
                   key={link.href}
                   to={link.href}
-                  className={`rounded-full px-3 py-1.5 text-sm transition-colors ${
+                  className={`rounded-full px-3 py-1.5 text-sm transition-[color,box-shadow] ${
                     isActive
-                      ? 'text-accent bg-accent-soft font-semibold'
+                      ? 'text-accent pressed font-semibold'
                       : 'text-muted hover:text-ink'
                   }`}
                 >
@@ -84,10 +90,7 @@ export function Header() {
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
-            <HashLink
-              to="#contact"
-              className="bg-accent text-accent-ink hidden rounded-full px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-90 sm:inline-flex"
-            >
+            <HashLink to="#contact" className="btn-primary btn-sm hidden sm:inline-flex">
               Hire Me
             </HashLink>
             <button
@@ -96,7 +99,9 @@ export function Header() {
               aria-expanded={open}
               aria-controls="mobile-menu"
               aria-label="Toggle menu"
-              className="border-line text-ink grid size-9 place-items-center rounded-full border lg:hidden"
+              className={`text-ink grid size-9 place-items-center rounded-full transition-shadow lg:hidden ${
+                open ? 'pressed' : 'card'
+              }`}
             >
               {open ? <CloseIcon /> : <MenuIcon />}
             </button>
@@ -107,7 +112,7 @@ export function Header() {
       {open && (
         <div
           id="mobile-menu"
-          className="border-line bg-paper max-h-[calc(100dvh-4rem)] overflow-y-auto border-t lg:hidden"
+          className="bg-paper section-bleed max-h-[calc(100dvh-4rem)] overflow-y-auto lg:hidden"
         >
           <Container className="py-4">
             <nav aria-label="Mobile" className="flex flex-col">
@@ -125,7 +130,7 @@ export function Header() {
             <HashLink
               to="#contact"
               onClick={() => setOpen(false)}
-              className="bg-accent text-accent-ink mt-4 mb-2 block rounded-full px-4 py-2.5 text-center text-sm font-semibold"
+              className="btn-primary mt-4 mb-2 flex w-full"
             >
               Hire Me
             </HashLink>

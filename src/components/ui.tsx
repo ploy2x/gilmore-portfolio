@@ -28,7 +28,7 @@ export function Section({
   return (
     <section
       id={id}
-      className={`${bleed ? 'bg-raised/60' : ''} border-line/70 border-t py-20 sm:py-28 ${className}`}
+      className={`${bleed ? 'section-bleed' : ''} py-20 sm:py-28 ${className}`}
     >
       <Container>{children}</Container>
     </section>
