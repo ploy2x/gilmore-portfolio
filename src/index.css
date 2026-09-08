@@ -1,0 +1,184 @@
+@import 'tailwindcss';
+
+/* Dark mode is an explicit, persisted choice written to <html data-theme>, not a
+   media query — the toggle has to win in both directions. */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo,
+    Consolas, 'Liberation Mono', monospace;
+
+  --color-paper: var(--c-paper);
+  --color-surface: var(--c-surface);
+  --color-raised: var(--c-raised);
+  --color-line: var(--c-line);
+  --color-ink: var(--c-ink);
+  --color-muted: var(--c-muted);
+  --color-faint: var(--c-faint);
+  --color-accent: var(--c-accent);
+  --color-accent-soft: var(--c-accent-soft);
+  --color-accent-ink: var(--c-accent-ink);
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Light is the default palette; every token is defined here so nothing depends
+   on a media query resolving. */
+:root {
+  --c-paper: #fbfaf7;
+  --c-surface: #ffffff;
+  --c-raised: #f4f2ee;
+  --c-line: #e4e1da;
+  --c-ink: #14161a;
+  --c-muted: #565b64;
+  --c-faint: #8b9099;
+  --c-accent: #0d6b58;
+  --c-accent-soft: #e3f2ed;
+  --c-accent-ink: #ffffff;
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --c-paper: #0a0c0f;
+  --c-surface: #12151a;
+  --c-raised: #191d24;
+  --c-line: #262c35;
+  --c-ink: #eceef1;
+  --c-muted: #9aa2ad;
+  --c-faint: #6b737e;
+  --c-accent: #3ed9ac;
+  --c-accent-soft: #10261f;
+  --c-accent-ink: #05231b;
+
+  color-scheme: dark;
+}
+
+@layer base {
+  * {
+    border-color: var(--c-line);
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* Sticky header height, so #anchor jumps don't hide the heading. */
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--c-paper);
+    color: var(--c-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--c-accent);
+    color: var(--c-accent-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--c-accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.028em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Small uppercase mono label that opens most sections. */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--c-accent);
+  }
+
+  .card {
+    background-color: var(--c-surface);
+    border: 1px solid var(--c-line);
+    border-radius: 0.875rem;
+    transition:
+      border-color 0.25s var(--ease-out-quint),
+      transform 0.25s var(--ease-out-quint),
+      box-shadow 0.25s var(--ease-out-quint);
+  }
+
+  .card-hover:hover {
+    border-color: color-mix(in oklab, var(--c-accent) 45%, var(--c-line));
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px -18px color-mix(in oklab, var(--c-ink) 55%, transparent);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--c-line);
+    background-color: var(--c-raised);
+    color: var(--c-muted);
+    border-radius: 999px;
+    padding: 0.25rem 0.625rem;
+    font-size: 0.75rem;
+    line-height: 1.1rem;
+    white-space: nowrap;
+  }
+
+  /* Numerals in the stat band must align in a row — tabular figures only. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.03em;
+  }
+}
+
+/* Entrance animation, applied only once an IntersectionObserver marks the
+   element visible. Reduced-motion users get the end state immediately. */
+.reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.6s var(--ease-out-quint),
+    transform 0.6s var(--ease-out-quint);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
