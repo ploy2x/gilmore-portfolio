@@ -195,14 +195,42 @@ export function Wins() {
   )
 }
 
+// Served from public/ so the same file backs the <img>, the og:image and the
+// JSON-LD Person.image without a build-hashed name to thread through.
+const PORTRAIT = `${import.meta.env.BASE_URL}gilmore.jpg`
+
 export function About() {
   return (
     <Section id="about" bleed>
-      <SectionHeading
-        eyebrow={about.eyebrow}
-        heading={about.heading}
-        intro={about.intro}
-      />
+      <div className="grid items-center gap-10 lg:grid-cols-[19rem_1fr] lg:gap-14">
+        <Reveal className="mx-auto w-full max-w-72 lg:mx-0">
+          <div className="relative">
+            <div
+              aria-hidden="true"
+              className="bg-accent-soft absolute -inset-3 -z-10 rounded-[1.75rem]"
+            />
+            <img
+              src={PORTRAIT}
+              alt="Gilmore Jason Dasmariñas"
+              width={640}
+              height={669}
+              loading="lazy"
+              decoding="async"
+              className="border-line h-auto w-full rounded-3xl border object-cover"
+            />
+          </div>
+        </Reveal>
+
+        <Reveal delay={80}>
+          <p className="eyebrow">{about.eyebrow}</p>
+          <h2 className="text-ink mt-3 text-3xl font-extrabold sm:text-4xl">
+            {about.heading}
+          </h2>
+          <p className="text-muted mt-4 text-base leading-relaxed sm:text-lg">
+            {about.intro}
+          </p>
+        </Reveal>
+      </div>
 
       <div className="mt-12 grid gap-5 md:grid-cols-3">
         {about.cards.map((card, i) => (
